@@ -1,0 +1,4 @@
+INSERT INTO players (first_name, last_name, nationality, date_of_birth)
+    VALUES ('test', 'Yojimbo', 'British', '14/01/2000');
+
+TRUNCATE TABLE players;ALTER SEQUENCE players_id_seq RESTART;
