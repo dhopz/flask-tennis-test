@@ -1,5 +1,5 @@
 """App entry point."""
-from tennis_test import create_app
+from tennisapp import create_app
 
 app = create_app()
 
