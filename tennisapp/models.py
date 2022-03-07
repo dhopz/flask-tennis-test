@@ -8,12 +8,11 @@ class PlayerModel(db.Model):
     last_name = db.Column(db.String())
     nationality = db.Column(db.String())
     date_of_birth = db.Column(db.Date())
+    points = db.Column(db.Integer(),default=1200)
 
     def __init__(self, first_name, last_name, nationality, date_of_birth):
         self.first_name = first_name
         self.last_name = last_name
         self.nationality = nationality
         self.date_of_birth = date_of_birth
-
-    def __repr__(self):
-        return f"<Player {self.first_name} {self.last_name}>"
+       
