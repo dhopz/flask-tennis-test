@@ -59,12 +59,27 @@ def handle_players():
 @app.route('/game_result', methods=['POST'])
 def game_result():
     data = json.loads(request.data)
-    print(data)
+    winner, loser = data['winner'], data['loser']
+    points_logic(winner,loser)   
     result = GameResultModel(                
-                    winner=data['winner'],
-                    loser=data['loser'],            
+                    winner=winner,
+                    loser=loser,            
                     )
     db.session.add(result)
     db.session.commit()
     #winner = PlayerModel.query.filter_by(player_name=winner)
     return {"message": "Games Result recorded"}
+
+def points_logic(winner,loser):     
+    losing_player = PlayerModel.query.filter_by(player_name=loser).first()
+    print(losing_player.points, "losing player points")
+    points_deducted = losing_player.points * 0.1
+    print(points_deducted)
+    losing_player.points = losing_player.points - points_deducted
+
+    winning_player = PlayerModel.query.filter_by(player_name=winner).first()
+    winning_player.points = winning_player.points + points_deducted
+    print(winning_player.points)
+    db.session.commit()
+
+    return 
