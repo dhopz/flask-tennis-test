@@ -1,4 +1,5 @@
 from . import db
+from sqlalchemy.orm import column_property
 
 class PlayerModel(db.Model):
     __tablename__ = 'players'
@@ -9,13 +10,29 @@ class PlayerModel(db.Model):
     nationality = db.Column(db.String())
     date_of_birth = db.Column(db.Date())
     points = db.Column(db.Integer(),default=1200)
+    player_name = db.Column(db.String())
     __table_args__ = (db.UniqueConstraint('last_name', 'first_name', name='player_name_uc'),)
-    #player_name = db.column(db.String(),primary_key=True)
+    
 
-    def __init__(self, first_name, last_name, nationality, date_of_birth):
+    def __init__(self, player_name, first_name, last_name, nationality, date_of_birth):
         self.first_name = first_name
         self.last_name = last_name
         self.nationality = nationality
         self.date_of_birth = date_of_birth
+        self.player_name = player_name
+
+class GameResultModel(db.Model):
+    __tablename__ = 'result'
+
+    id = db.Column(db.Integer,primary_key=True)
+    winner = db.Column(db.String())
+    loser = db.Column(db.String())
+
+    def __init__(self,winner,loser):
+        self.winner = winner
+        self.loser = loser
+
+        
+
 
        

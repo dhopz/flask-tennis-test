@@ -2,11 +2,10 @@
 #from datetime import datetime
 import datetime
 from sqlalchemy import exc
-
 from flask import current_app as app
-from flask import request, jsonify, json
+from flask import request, json
 
-from .models import PlayerModel, db
+from .models import PlayerModel, GameResultModel, db
 
 def age(dob):
     today = datetime.date.today()
@@ -31,7 +30,8 @@ def handle_players():
                     first_name=data['first_name'],
                     last_name=data['last_name'],
                     nationality=data['nationality'],
-                    date_of_birth=datetime.datetime.strptime(data['date_of_birth'], '%d/%m/%Y')            
+                    date_of_birth=datetime.datetime.strptime(data['date_of_birth'], '%d/%m/%Y'),
+                    player_name=data['last_name']+data['first_name']           
                     )
                 db.session.add(new_player)
                 db.session.commit()
@@ -47,10 +47,24 @@ def handle_players():
                     "first_name": player.first_name,
                     "last_name": player.last_name,
                     "nationality": player.nationality,
-                    "date_of_birth":player.date_of_birth
+                    "date_of_birth":player.date_of_birth,
+                    "points":player.points
                 } for player in players]
 
             return {"count": len(results), "Players": results, "message": "success"}    
     
     except exc.IntegrityError:
         return {"error": "The Player has already been registered"}
+
+@app.route('/game_result', methods=['POST'])
+def game_result():
+    data = json.loads(request.data)
+    print(data)
+    result = GameResultModel(                
+                    winner=data['winner'],
+                    loser=data['loser'],            
+                    )
+    db.session.add(result)
+    db.session.commit()
+    #winner = PlayerModel.query.filter_by(player_name=winner)
+    return {"message": "Games Result recorded"}

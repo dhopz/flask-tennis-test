@@ -11,4 +11,3 @@ def test_new_player():
     assert player.last_name == "McTest"
     assert player.nationality == "British"
     assert player.date_of_birth == "14/01/2000"
-    assert player.points == "1200"
