@@ -2,3 +2,15 @@ INSERT INTO players (first_name, last_name, nationality, date_of_birth)
     VALUES ('test', 'Yojimbo', 'British', '14/01/2000');
 
 TRUNCATE TABLE players;ALTER SEQUENCE players_id_seq RESTART;
+
+CREATE OR REPLACE VIEW player_rank AS
+SELECT first_name, last_name, date_of_birth, nationality, points, EXTRACT(YEAR from AGE(CURRENT_DATE, date_of_birth)) as "age",
+    CASE 
+        WHEN points <= 2999 THEN 'Bronze' 
+        ELSE 'SuperSonic Legend' 
+    END
+    AS current_rank
+FROM players
+ORDER BY points DESC;
+
+-- \dv to see the view
