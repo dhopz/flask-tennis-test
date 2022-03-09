@@ -4,13 +4,65 @@ INSERT INTO players (first_name, last_name, nationality, date_of_birth)
 TRUNCATE TABLE players;ALTER SEQUENCE players_id_seq RESTART;
 
 CREATE OR REPLACE VIEW player_rank AS
-SELECT first_name, last_name, date_of_birth, nationality, points, EXTRACT(YEAR from AGE(CURRENT_DATE, date_of_birth)) as "age",
+SELECT player_name, first_name, last_name, date_of_birth, nationality, points, EXTRACT(YEAR from AGE(CURRENT_DATE, date_of_birth)) as "age",
     CASE 
-        WHEN points <= 2999 THEN 'Bronze' 
-        ELSE 'SuperSonic Legend' 
+        WHEN points BETWEEN 0 AND 2999 THEN 'Bronze'
+        WHEN points BETWEEN 3000 AND 4999 THEN 'Silver'
+        WHEN points BETWEEN 5000 AND 9999 THEN 'Gold'
+        WHEN points >= 10000 THEN 'SuperSonic Legend' 
     END
     AS current_rank
 FROM players
 ORDER BY points DESC;
 
 -- \dv to see the view
+UPDATE players SET points = 6000 WHERE first_name = 'Test3';
+
+CREATE OR REPLACE VIEW games_won AS
+SELECT COUNT(winner) AS games, winner AS player
+FROM result
+GROUP BY player;
+
+CREATE OR REPLACE VIEW games_lost AS
+SELECT COUNT(loser) AS games, loser AS player
+FROM result
+GROUP BY player;
+
+SELECT winner,loser, COUNT(*)
+FROM result
+GROUP BY winner, loser;
+
+CREATE OR REPLACE VIEW games_played AS
+SELECT SUM(games) AS games, player FROM
+(SELECT * FROM games_lost
+UNION
+SELECT * FROM games_won) AS total_games
+GROUP BY player;
+
+CREATE OR REPLACE VIEW player_rank AS
+SELECT first_name, last_name, EXTRACT(YEAR from AGE(CURRENT_DATE, date_of_birth)) as "age", nationality, points,
+    CASE
+        WHEN games_played.games IS NULL THEN 'Unranked'
+        WHEN games_played.games < 3 THEN 'Unranked'
+        WHEN points BETWEEN 0 AND 2999 THEN 'Bronze'
+        WHEN points BETWEEN 3000 AND 4999 THEN 'Silver'
+        WHEN points BETWEEN 5000 AND 9999 THEN 'Gold'
+        WHEN points >= 10000 THEN 'Supersonic Legend'
+    END AS current_rank
+FROM players
+LEFT JOIN games_played
+    ON games_played.player = players.player_name;
+
+CREATE OR REPLACE VIEW player_rankings AS
+SELECT first_name, last_name, age, nationality, points, current_rank
+FROM player_rank
+ORDER BY
+    CASE 
+        WHEN current_rank = 'Unranked' THEN 5
+        WHEN current_rank = 'Bronze' THEN 4
+        WHEN current_rank = 'Silver' THEN 3
+        WHEN current_rank = 'Gold' THEN 2
+        WHEN current_rank = 'Supersonic Legend' THEN 1
+    END;
+
+
