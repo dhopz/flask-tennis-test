@@ -4,6 +4,7 @@ import datetime
 from sqlalchemy import exc
 from flask import current_app as app
 from flask import request, json
+from init_db import session
 
 from .models import PlayerModel, GameResultModel, db
 
@@ -46,9 +47,7 @@ def handle_players():
                 {
                     "first_name": player.first_name,
                     "last_name": player.last_name,
-                    "nationality": player.nationality,
-                    "date_of_birth":player.date_of_birth,
-                    "points":player.points
+                    "nationality": player.nationality
                 } for player in players]
 
             return {"count": len(results), "Players": results, "message": "success"}    
@@ -69,6 +68,32 @@ def game_result():
     db.session.commit()
     #winner = PlayerModel.query.filter_by(player_name=winner)
     return {"message": "Games Result recorded"}
+
+
+# nationality or current rank
+# for example nationality/british or current_rank/bronze
+@app.route('/player_rankings/', defaults={'query_type': None, 'query_parameter': None})
+@app.route('/player_rankings/<string:query_type>/<string:query_parameter>', methods=['GET'])
+def player_rankings(query_type, query_parameter):
+    print(query_type, query_parameter)
+    if query_type == 'nationality':
+        players = session.execute(f"SELECT * FROM player_rankings WHERE nationality = '{query_parameter}'").all()
+    elif query_type == 'current_rank':
+        players = session.execute(f"SELECT * FROM player_rankings WHERE current_rank = '{query_parameter}'").all()
+    else:
+        players = session.execute("SELECT * FROM player_rankings").all()
+        
+    results = [
+        {
+            "first_name": player.first_name,
+            "last_name": player.last_name,
+            "nationality": player.nationality,
+            "age":player.age,
+            "points":player.points,
+            "current_rank":player.current_rank
+        } for player in players]
+    
+    return {"count": len(results), "Players": results, "message": "success"}    
 
 def points_logic(winner,loser):     
     losing_player = PlayerModel.query.filter_by(player_name=loser).first()
