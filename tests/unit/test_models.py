@@ -1,4 +1,5 @@
 from tennisapp.models import PlayerModel
+import datetime
 
 def test_new_player():
     ''' 
@@ -6,7 +7,8 @@ def test_new_player():
     WHEN a new Player is created
     THEN check data is in correct format
     '''
-    player = PlayerModel("Player1","McTest","British","14/01/2000")
+    player = PlayerModel("McTestPlayer1","Player1","McTest","British","14/01/2000")
+    assert player.player_name == "McTestPlayer1"
     assert player.first_name == "Player1"
     assert player.last_name == "McTest"
     assert player.nationality == "British"

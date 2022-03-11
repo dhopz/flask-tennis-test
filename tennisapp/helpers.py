@@ -1,6 +1,7 @@
 import datetime
 from .models import PlayerModel, db
 
+# function for defining age from todays date in years
 def age(dob):
     today = datetime.date.today()
     years = today.year - dob.year
@@ -8,6 +9,7 @@ def age(dob):
         years -= 1
     return years
 
+# function for defining losers and winners points when endpoint /game_result scoring logic
 def points_logic(winner,loser):     
     losing_player = PlayerModel.query.filter_by(player_name=loser).first()
     points_deducted = losing_player.points * 0.1    

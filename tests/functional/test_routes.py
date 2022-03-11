@@ -10,14 +10,14 @@ def client():
     with app.test_client() as client:
         yield client
         
-# def test_home_page(client):    
-#     response = client.get('/')
-#     expected = {'hello': 'world'}
-#     assert response.status_code == 200
-#     assert expected == json.loads(response.get_data(as_text=True))
-        
-def test_handle_players(client):     
-    response = client.get('/players')
-    print(response.data, "something else")
+def test_home_page(client):    
+    response = client.get('/')
+    expected = {'hello': 'world'}
     assert response.status_code == 200
-    assert response.message == "success"
+    assert expected == json.loads(response.get_data(as_text=True))
+        
+# def test_handle_players(client):     
+#     response = client.get('/players')
+#     print(response.data, "something else")
+#     assert response.status_code == 200
+#     assert response.message == "success"
