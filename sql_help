@@ -38,7 +38,7 @@ LEFT JOIN games_played
     ON games_played.player = players.player_name;
 
 CREATE OR REPLACE VIEW player_rankings AS
-SELECT first_name, last_name, age, nationality, points, current_rank
+SELECT row_number() over () as ranking, first_name, last_name, age, nationality, points, current_rank
 FROM player_rank
 ORDER BY
     CASE 
@@ -51,3 +51,5 @@ ORDER BY
 
 DROP VIEW games_lost, games_played, games_won, player_rank, player_rankings;
 
+SELECT row_number() over(ORDER BY current_rank) as ranking, *
+FROM player_rank;

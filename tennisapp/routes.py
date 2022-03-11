@@ -7,14 +7,7 @@ from flask import request, json
 from init_db import session
 
 from .models import PlayerModel, GameResultModel, db
-
-def age(dob):
-    today = datetime.date.today()
-    years = today.year - dob.year
-    if today.month < dob.month or (today.month == dob.month and today.day < dob.day):
-        years -= 1
-    return years
-
+from .helpers import age, points_logic
 
 @app.route('/')
 def hello():
@@ -40,7 +33,6 @@ def handle_players():
             else:
                 return {"error": "The Player needs to be at least 16"}
 
-
         elif request.method == 'GET':
             players = PlayerModel.query.all()
             results = [
@@ -59,15 +51,14 @@ def handle_players():
 def game_result():
     data = json.loads(request.data)
     winner, loser = data['winner'], data['loser']
-    points_logic(winner,loser)   
+    scoring_logic = points_logic(winner,loser)   
     result = GameResultModel(                
                     winner=winner,
                     loser=loser,            
                     )
     db.session.add(result)
     db.session.commit()
-    #winner = PlayerModel.query.filter_by(player_name=winner)
-    return {"message": "Games Result recorded"}
+    return {"message": "Games Result recorded", "scoring_logic":scoring_logic}
 
 
 # nationality or current rank
@@ -77,14 +68,15 @@ def game_result():
 def player_rankings(query_type, query_parameter):
     print(query_type, query_parameter)
     if query_type == 'nationality':
-        players = session.execute(f"SELECT * FROM player_rankings WHERE nationality = '{query_parameter}'").all()
+        players = session.execute(f"SELECT row_number() over(ORDER BY current_rank) as ranking,* FROM player_rankings WHERE nationality = '{query_parameter}'").all()
     elif query_type == 'current_rank':
-        players = session.execute(f"SELECT * FROM player_rankings WHERE current_rank = '{query_parameter}'").all()
+        players = session.execute(f"SELECT row_number() over(ORDER BY current_rank) as ranking, * FROM player_rankings WHERE current_rank = '{query_parameter}'").all()
     else:
-        players = session.execute("SELECT * FROM player_rankings").all()
+        players = session.execute("SELECT row_number() over(ORDER BY current_rank) as ranking, * FROM player_rankings").all()
         
     results = [
         {
+            "ranking":player.ranking,
             "first_name": player.first_name,
             "last_name": player.last_name,
             "nationality": player.nationality,
@@ -95,16 +87,3 @@ def player_rankings(query_type, query_parameter):
     
     return {"count": len(results), "Players": results, "message": "success"}    
 
-def points_logic(winner,loser):     
-    losing_player = PlayerModel.query.filter_by(player_name=loser).first()
-    print(losing_player.points, "losing player points")
-    points_deducted = losing_player.points * 0.1
-    print(points_deducted)
-    losing_player.points = losing_player.points - points_deducted
-
-    winning_player = PlayerModel.query.filter_by(player_name=winner).first()
-    winning_player.points = winning_player.points + points_deducted
-    print(winning_player.points)
-    db.session.commit()
-
-    return 
