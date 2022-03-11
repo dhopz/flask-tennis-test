@@ -1,11 +1,17 @@
-INSERT INTO players (first_name, last_name, nationality, date_of_birth)
-    VALUES ('test', 'Yojimbo', 'British', '14/01/2000');
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+import os
+from dotenv import load_dotenv
 
-TRUNCATE TABLE players;ALTER SEQUENCE players_id_seq RESTART;
+load_dotenv()
 
--- \dv to see the view
-UPDATE players SET points = 6000 WHERE first_name = 'Test3';
+DATABASE_USERNAME = os.getenv('DATABASE_USERNAME')
 
+engine = create_engine("postgresql+psycopg2://"+DATABASE_USERNAME+":postgres@localhost/tennis")
+
+# Initialize the session
+session = Session(engine)
+query = """
 CREATE OR REPLACE VIEW games_won AS
 SELECT COUNT(winner) AS games, winner AS player
 FROM result
@@ -48,6 +54,7 @@ ORDER BY
         WHEN current_rank = 'Gold' THEN 2
         WHEN current_rank = 'Supersonic Legend' THEN 1
     END;
+"""
 
-DROP VIEW games_lost, games_played, games_won, player_rank, player_rankings;
-
+session.execute(query)
+session.commit()

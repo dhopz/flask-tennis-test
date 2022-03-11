@@ -1,5 +1,8 @@
 from . import db
-from sqlalchemy.orm import column_property
+from sqlalchemy_views import CreateView
+from sqlalchemy import Table, MetaData
+from sqlalchemy.sql import text
+from sqlalchemy_utils import create_view
 
 class PlayerModel(db.Model):
     __tablename__ = 'players'
@@ -32,7 +35,6 @@ class GameResultModel(db.Model):
         self.winner = winner
         self.loser = loser
 
-        
 
 
        
