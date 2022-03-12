@@ -3,17 +3,19 @@
 import datetime
 from sqlalchemy import exc
 from flask import current_app as app
-from flask import request, json
+from flask import request, json, Blueprint
 from init_db import session
 
 from .models import PlayerModel, GameResultModel, db
 from .helpers import age, points_logic
 
-@app.route('/')
+home_bp = Blueprint('home_bp', __name__,)
+
+@home_bp.route('/')
 def hello():
 	return {"hello": "world"}
 
-@app.route('/players', methods=['POST', 'GET'])
+@home_bp.route('/players', methods=['POST', 'GET'])
 def handle_players():
     try:
         if request.method == 'POST':
@@ -47,7 +49,7 @@ def handle_players():
     except exc.IntegrityError:
         return {"error": "The Player has already been registered"}
 
-@app.route('/game_result', methods=['POST'])
+@home_bp.route('/game_result', methods=['POST'])
 def game_result():
     data = json.loads(request.data)
     winner, loser = data['winner'], data['loser']
@@ -63,8 +65,8 @@ def game_result():
 
 # nationality or current rank
 # for example nationality/british or current_rank/bronze
-@app.route('/player_rankings/', defaults={'query_type': None, 'query_parameter': None})
-@app.route('/player_rankings/<string:query_type>/<string:query_parameter>', methods=['GET'])
+@home_bp.route('/player_rankings/', defaults={'query_type': None, 'query_parameter': None})
+@home_bp.route('/player_rankings/<string:query_type>/<string:query_parameter>', methods=['GET'])
 def player_rankings(query_type, query_parameter):
     print(query_type, query_parameter)
     if query_type == 'nationality':

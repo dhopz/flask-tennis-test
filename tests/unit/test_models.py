@@ -1,5 +1,4 @@
-from tennisapp.models import PlayerModel
-import datetime
+from tennisapp.home.models import PlayerModel
 
 def test_new_player():
     ''' 

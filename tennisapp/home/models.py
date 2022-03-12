@@ -1,4 +1,4 @@
-from . import db
+from tennisapp import db
 from sqlalchemy_views import CreateView
 from sqlalchemy import Table, MetaData
 from sqlalchemy.sql import text
