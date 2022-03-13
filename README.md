@@ -10,7 +10,6 @@ As the president of the local Tennis Club, this backend API will manage its play
 Kindly ensure you have the following installed:
 - [ ] [Python 3.8](https://www.python.org/downloads/release/python-389/)
 - [ ] [Pip](https://pip.pypa.io/en/stable/installing/)
-- [ ] [Virtualenv](https://virtualenv.pypa.io/en/stable/installation/)
 - [ ] [PostgreSQL](https://www.postgresql.org/)
 
 ### Setting up + Running
@@ -33,8 +32,7 @@ Kindly ensure you have the following installed:
 3. Create a PostgreSQL user with the username and password `postgres` and create a database called `tennis`:
 
     ```
-    $ createuser --interactive --pwprompt
-    $ createdb tennis
+   $ createdb tennis
     ```
 
 4. Export the required environment variables:
@@ -43,11 +41,12 @@ Kindly ensure you have the following installed:
     $ export FLASK_APP=app.py
     ```
 
-5. Execute the migrations to create the `tennis` table:
+5. Execute the migrations to create the `tennis` table and run python3 `init_db.py` to create the SQL logic for the rankings :
 
     ```
     $ flask db migrate
     $ flask db upgrade
+    $ python3 init_db.py
     ```
 
 6. Run the Flask API:
