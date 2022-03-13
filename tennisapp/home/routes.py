@@ -68,7 +68,6 @@ def game_result():
 @home_bp.route('/player_rankings/', defaults={'query_type': None, 'query_parameter': None})
 @home_bp.route('/player_rankings/<string:query_type>/<string:query_parameter>', methods=['GET'])
 def player_rankings(query_type, query_parameter):
-    print(query_type, query_parameter)
     if query_type == 'nationality':
         players = session.execute(f"SELECT row_number() over(ORDER BY current_rank) as ranking,* FROM player_rankings WHERE nationality = '{query_parameter}'").all()
     elif query_type == 'current_rank':

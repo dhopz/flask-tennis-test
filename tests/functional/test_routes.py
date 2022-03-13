@@ -27,7 +27,6 @@ def client():
         
 def test_connection(client):    
     response = client.get('/')
-    print(response.data)
     expected = {'hello': 'world'}
     assert response.status_code == 200
     assert expected == json.loads(response.get_data(as_text=True))
@@ -58,8 +57,21 @@ def test_create_player(client):
     }
     response = client.post('/players', data=json.dumps(data))
     res = json.loads(response.data.decode('utf-8'))
-    print(res)    
+    print(res)
     assert res['message'] == "Player John Jones has been created successfully."
+
+def test_duplicate_player(client):
+    data = {
+        "first_name":"John",
+        "last_name":"Jones",
+        "nationality":"British",
+        "date_of_birth":"14/01/2000"
+    }
+    response = client.post('/players', data=json.dumps(data))
+    response2 = client.post('/players', data=json.dumps(data))
+    res = json.loads(response2.data.decode('utf-8'))
+    print(res)
+    assert res['error'] == "The Player has already been registered"
     
 def test_game_result(client):
     data = {
@@ -71,3 +83,10 @@ def test_game_result(client):
     assert response.status_code == 200
     assert res['message'] == "Games Result recorded"
     assert res['scoring_logic'] == {'loser_points': 1080, 'winner_points': 1320}
+
+def test_player_rankings(client):
+    response = client.get('/player_rankings/')
+    res = json.loads(response.data.decode('utf-8')) 
+    print(res)   
+    assert response.status_code == 200
+    assert res['message'] == "success"
